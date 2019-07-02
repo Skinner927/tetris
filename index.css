@@ -4,6 +4,12 @@ body, * {
   box-sizing: border-box;
 }
 
+#ver {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
 #wrapper {
   display: flex;
   flex-direction: column;

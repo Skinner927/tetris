@@ -1,6 +1,7 @@
 // TODO: wrap this in iife but for now debugging is easy
 window.ALLOW_CHEATS = true;
 
+const autoStep = true; // Set to false to debug
 const blockSize = 20; // px TODO: should make this % so the grid scales
 const numRows = 20;
 const numCols = 12;
@@ -31,6 +32,11 @@ for (let y = 0; y < numRows; y++) {
     $row.appendChild($cell);
     board[y][x] = $cell;
   }
+}
+
+function isNumber(val) {
+  // iFinite is false for NaN and +/-Infinity
+  return typeof val === 'number' && isFinite(val);
 }
 
 // Define shapes
@@ -109,7 +115,7 @@ Shape.prototype.rotate = function rotate() {
 // Rotate, but checks for collisions
 Shape.prototype.safeRotate = function safeRotate() {
   this.rotate();
-  if (!this.drawAt()) {
+  if (!this.drawAt(null, null, false, true)) {
     this.rotate();
     this.rotate();
     this.rotate();
@@ -128,15 +134,17 @@ Shape.prototype.remove = function remove() {
  * @param {Number} [x=this.x]
  * @param {Boolean} [shapeCollisionReturnVal=false] - Return value when
  *  collision with another shape.
+ * @param {Boolean} [falseOnSideWallCollision=false] - If true, we return false
+ *  on any side wall collision. By default (false) side wall collisions are ignored.
  * @returns {Boolean|Object} Returns false if moving would cause a
  *  collision on the south side of the shape,
  *  true if no problems.
  */
-Shape.prototype.drawAt = function drawAt(y, x, shapeCollisionReturnVal) {
-  if (typeof y === 'undefined') {
+Shape.prototype.drawAt = function drawAt(y, x, shapeCollisionReturnVal, falseOnSideWallCollision) {
+  if (!isNumber(y)) {
     y = this.y;
   }
-  if (typeof x === 'undefined') {
+  if (!isNumber(x)) {
     x = this.x;
   }
 
@@ -151,7 +159,7 @@ Shape.prototype.drawAt = function drawAt(y, x, shapeCollisionReturnVal) {
   if (x < 0 || (x + this.width) > boardWidth) {
     // Ignore moves outside the left/right bounds
     console.log('side');
-    return true;
+    return !falseOnSideWallCollision;
   }
 
   // There's likely more elegant ways, but first we'll check to see
@@ -212,7 +220,7 @@ Shape.prototype.move = function move(deltaY, deltaX) {
 
 // Game functions
 function startNewShape(i) {
-  if (typeof i === 'undefined') {
+  if (!isNumber(i)) {
     i = Math.floor(Math.random() * shapes.length);
   }
   activeShape = new Shape(shapes[i], colors[i]);
@@ -230,6 +238,9 @@ function startNewShape(i) {
 }
 
 function resetForcedMove() {
+  if (!autoStep) {
+    return;
+  }
   if (moveTimeout) {
     window.clearTimeout(moveTimeout);
   }
