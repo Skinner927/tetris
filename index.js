@@ -167,7 +167,7 @@ Shape.prototype.drawAt = function drawAt(y, x, shapeCollisionReturnVal, falseOnS
   for (let yo = 0; yo < this.height; yo++) {
     for (let xo = 0; xo < this.width; xo++) {
       if (this.shape[yo][xo] === 1 && board[y + yo][x + xo].hasChildNodes()) {
-        const willCollide = Array.prototype.some.call(board[y + yo][x + xo].childNodes, function(el) {
+        const willCollide = Array.prototype.some.call(board[y + yo][x + xo].childNodes, function (el) {
           return el && this.activeCells.indexOf(el) === -1;
         }.bind(this));
         if (willCollide) {
@@ -196,7 +196,8 @@ Shape.prototype.drawAt = function drawAt(y, x, shapeCollisionReturnVal, falseOnS
   return true;
 };
 Shape.prototype.drop = function drop() {
-  while(this.move(1, 0)) {}
+  while (this.move(1, 0)) {
+  }
 };
 // Move the shape given a delta
 // This is does most of the logic
@@ -227,7 +228,7 @@ function startNewShape(i) {
 
   if (!activeShape.drawAt(0, Math.ceil((numCols - activeShape.width) / 2))) {
     if (moveTimeout) {
-      window.clearTimeout(moveTimeout);
+      clearTimeout(moveTimeout);
       moveTimeout = null;
     }
     alert('GAME OVER! \nYour score is ' + score);
@@ -242,9 +243,9 @@ function resetForcedMove() {
     return;
   }
   if (moveTimeout) {
-    window.clearTimeout(moveTimeout);
+    clearTimeout(moveTimeout);
   }
-  moveTimeout = window.setTimeout(function() {
+  moveTimeout = setTimeout(function () {
     if (activeShape) {
       resetForcedMove();
       activeShape.move(1, 0);
@@ -255,8 +256,8 @@ function resetForcedMove() {
 // Only call this when the activeShape has collided and stopped moving.
 function clearCompletedRows() {
   function emptyRow(row) {
-    row.forEach(function(cell) {
-      cell.childNodes.forEach(function(e) {
+    row.forEach(function (cell) {
+      cell.childNodes.forEach(function (e) {
         cell.removeChild(e);
       });
     });
@@ -265,7 +266,7 @@ function clearCompletedRows() {
   let linesCleared = 0;
   for (let i = board.length - 1; i >= 0; i--) {
     const row = board[i];
-    const full = row.every(function(cell) {
+    const full = row.every(function (cell) {
       return cell.hasChildNodes();
     });
     if (!full) {
@@ -277,8 +278,8 @@ function clearCompletedRows() {
     // Shift everything down
     for (let j = i; j > 0; j--) {
       const rowOnTop = board[j - 1];
-      rowOnTop.forEach(function(cell, i) {
-        cell.childNodes.forEach(function(child) {
+      rowOnTop.forEach(function (cell, i) {
+        cell.childNodes.forEach(function (child) {
           board[j][i].appendChild(child);
         });
       });
@@ -288,7 +289,7 @@ function clearCompletedRows() {
   }
 
   // Add the score
-  switch(linesCleared) {
+  switch (linesCleared) {
     case 1:
       score += 100;
       break;
@@ -305,35 +306,46 @@ function clearCompletedRows() {
   $score.innerHTML = score;
 }
 
-// Listen for events
-document.addEventListener('keydown', function (e) {
+// Returns false when handled, and true when not.
+// This way we can use it directly in an onclick handler.
+window.userInput = function userInput(key, e) {
   if (!activeShape) {
-    return;
+    return true;
   }
 
-  if (e.key === 'ArrowDown') {
+  if (key === 'ArrowDown') {
     activeShape.move(1, 0);
-  } else if (e.key === 'ArrowUp') {
+  } else if (key === 'ArrowUp') {
     activeShape.drop();
-  } else if (e.key === 'ArrowRight') {
+  } else if (key === 'ArrowRight') {
     activeShape.move(0, 1);
-  } else if (e.key === 'ArrowLeft') {
+  } else if (key === 'ArrowLeft') {
     activeShape.move(0, -1);
-  } else if (e.key === ' ') {
+  } else if (key === ' ') {
     activeShape.safeRotate();
-  } else if (window.ALLOW_CHEATS && e.key === ('' + parseInt(e.key, 10))) {
+  } else if (window.ALLOW_CHEATS && key === ('' + parseInt(key, 10))) {
     // Pressing number keys allows us to debug
-    const index = parseInt(e.key, 10) - 1;
+    const index = parseInt(key, 10) - 1;
     if (index >= shapes.length) {
       console.log('shape index out of bounds');
-      return;
+      return true;
     }
     activeShape.remove();
     startNewShape(index);
   } else {
-    console.log('unknown key event', e.key, e);
+    console.log('unknown key event', key, e);
+    return true;
   }
-}, {passive: true, capture: true,});
+  return false;
+};
+
+// Listen for global events
+document.addEventListener('keydown', function (e) {
+  if (!userInput(e.key, e)) {
+    e.cancelBubble = true;
+    e.preventDefault()
+  }
+}, {capture: true});
 
 
 // Start the game

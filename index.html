@@ -9,13 +9,50 @@
   <link rel="stylesheet" type="text/css" href="index.css">
 </head>
 <body>
-<div id="ver">v1.1</div>
+<div id="ver">v2</div>
+
 <div id="wrapper">
   <div id="score"></div>
   <div id="controls"><button onclick="window.location.reload()">Restart</button></div>
-  <div id="board"></div>
+  <div id="board-wrapper">
+    <!-- SVGs from https://icomoon.io/app/ -->
+    <div class="screen-controls left">
+      <button onclick="userInput('ArrowLeft')">
+        <svg viewBox="0 0 32 32"><path d="M1 16l15 15v-9h16v-12h-16v-9z"></path></svg>
+      </button>
+      <button onclick="userInput('ArrowDown')">
+        <svg viewBox="0 0 32 32"><path d="M16 31l15-15h-9v-16h-12v16h-9z"></path></svg>
+      </button>
+      <br>
+      <div class="numbers">
+        <button onclick="userInput(this.innerHTML.trim())">1</button>
+        <button onclick="userInput(this.innerHTML.trim())">2</button>
+        <button onclick="userInput(this.innerHTML.trim())">3</button>
+        <button onclick="userInput(this.innerHTML.trim())">4</button>
+        <button onclick="userInput(this.innerHTML.trim())">5</button>
+        <button onclick="userInput(this.innerHTML.trim())">6</button>
+        <button onclick="userInput(this.innerHTML.trim())">7</button>
+      </div>
+    </div>
+
+    <!-- where the magic happens -->
+    <div id="board"></div>
+
+    <div class="screen-controls right">
+      <button onclick="userInput('ArrowRight')">
+        <svg viewBox="0 0 32 32"><path d="M31 16l-15-15v9h-16v12h16v9z"></path></svg>
+      </button>
+      <button onclick="userInput(' ')"> <!-- rotate -->
+        <svg viewBox="0 0 32 32"><path d="M32 12h-12l4.485-4.485c-2.267-2.266-5.28-3.515-8.485-3.515s-6.219 1.248-8.485 3.515c-2.266 2.267-3.515 5.28-3.515 8.485s1.248 6.219 3.515 8.485c2.267 2.266 5.28 3.515 8.485 3.515s6.219-1.248 8.485-3.515c0.189-0.189 0.371-0.384 0.546-0.583l3.010 2.634c-2.933 3.349-7.239 5.464-12.041 5.464-8.837 0-16-7.163-16-16s7.163-16 16-16c4.418 0 8.418 1.791 11.313 4.687l4.687-4.687v12z"></path></path></svg>
+      </button>
+      <button onclick="userInput('ArrowUp')">
+        <svg viewBox="0 0 32 32"><path d="M16 1l-15 15h9v16h12v-16h9z"></path></svg>
+      </button>
+    </div>
+  </div>
   <div style="padding-top: 1em;">
     <h4>Controls</h4>
+    <p><i>Use keyboard or screen controls</i></p>
     <ul>
       <li>Arrow keys for left/right/down</li>
       <li>Up arrow will drop the piece</li>
