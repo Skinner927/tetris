@@ -39,12 +39,12 @@ const shapeStraight = [
   [1, 1, 1, 1],
 ];
 const shapeLeftL = [
-  [1, 0, 0, 0],
-  [1, 1, 1, 1],
+  [1, 0, 0],
+  [1, 1, 1],
 ];
 const shapeRightL = [
-  [0, 0, 0, 1],
-  [1, 1, 1, 1],
+  [0, 0, 1],
+  [1, 1, 1],
 ];
 const shapeSquare = [
   [1, 1],
@@ -115,8 +115,8 @@ Shape.prototype.remove = function remove() {
 };
 /**
  * Draw this shape on the board
- * @param {Number} y
- * @param {Number} x
+ * @param {Number} [y=this.y]
+ * @param {Number} [x=this.x]
  * @param {Boolean} [shapeCollisionReturnVal=false] - Return value when
  *  collision with another shape.
  * @returns {Boolean|Object} Returns false if moving would cause a
@@ -178,6 +178,9 @@ Shape.prototype.drawAt = function drawAt(y, x, shapeCollisionReturnVal) {
   this.y = y;
   return true;
 };
+Shape.prototype.drop = function drop() {
+  while(this.move(1, 0)) {}
+};
 // Move the shape given a delta
 // This is does most of the logic
 Shape.prototype.move = function move(deltaY, deltaX) {
@@ -191,14 +194,18 @@ Shape.prototype.move = function move(deltaY, deltaX) {
   if (!this.drawAt(this.y + deltaY, this.x + deltaX, deltaX !== 0)) {
     clearCompletedRows();
     startNewRandomShape();
+    return false;
   } else if (deltaY !== 0) {
     resetForcedMove();
   }
+  return true;
 };
 
 // Game functions
-function startNewRandomShape() {
-  const i = Math.floor(Math.random() * shapes.length);
+function startNewRandomShape(i) {
+  if (typeof i === 'undefined') {
+    i = Math.floor(Math.random() * shapes.length);
+  }
   activeShape = new Shape(shapes[i], colors[i]);
 
   if (!activeShape.drawAt(0, Math.ceil((numCols - activeShape.width) / 2))) {
@@ -286,6 +293,8 @@ document.addEventListener('keydown', function (e) {
 
   if (e.key === 'ArrowDown') {
     activeShape.move(1, 0);
+  } else if (e.key === 'ArrowUp') {
+    activeShape.drop();
   } else if (e.key === 'ArrowRight') {
     activeShape.move(0, 1);
   } else if (e.key === 'ArrowLeft') {
@@ -301,8 +310,7 @@ document.addEventListener('keydown', function (e) {
       return;
     }
     activeShape.remove();
-    activeShape = new Shape(shapes[index], colors[index]);
-    activeShape.drawAt(0, Math.ceil((numCols - activeShape.width) / 2));
+    startNewRandomShape(index);
   } else {
     console.log('unknown key event', e.key, e);
   }
