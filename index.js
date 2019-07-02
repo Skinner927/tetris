@@ -15,6 +15,7 @@ const board = []; // y, x
 
 let activeShape = null;
 let moveTimeout = null;
+let hasCheated = false;
 let score = 0;
 $score.innerHTML = score;
 
@@ -332,6 +333,13 @@ window.userInput = function userInput(key, e) {
     }
     activeShape.remove();
     startNewShape(index);
+    if (!hasCheated) {
+      hasCheated = true;
+      const cheater = document.createElement('div');
+      cheater.style.color = 'red';
+      cheater.innerText = 'CHEATER';
+      $score.parentElement.insertBefore(cheater, $score.nextSibling);
+    }
   } else {
     console.log('unknown key event', key, e);
     return true;
