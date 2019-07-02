@@ -90,7 +90,7 @@ Object.defineProperties(Shape.prototype, {
     }
   }
 });
-// Rotates clockwise
+// Rotates clockwise (likely use safeRotate instead)
 Shape.prototype.rotate = function rotate() {
   const shape = this.shape;
   const rows = shape.length;
@@ -105,6 +105,15 @@ Shape.prototype.rotate = function rotate() {
   }
 
   this.shape = newShape;
+};
+// Rotate, but checks for collisions
+Shape.prototype.safeRotate = function safeRotate() {
+  this.rotate();
+  if (!this.drawAt()) {
+    this.rotate();
+    this.rotate();
+    this.rotate();
+  }
 };
 // Remove this shape from the board
 Shape.prototype.remove = function remove() {
@@ -193,7 +202,7 @@ Shape.prototype.move = function move(deltaY, deltaX) {
 
   if (!this.drawAt(this.y + deltaY, this.x + deltaX, deltaX !== 0)) {
     clearCompletedRows();
-    startNewRandomShape();
+    startNewShape();
     return false;
   } else if (deltaY !== 0) {
     resetForcedMove();
@@ -202,7 +211,7 @@ Shape.prototype.move = function move(deltaY, deltaX) {
 };
 
 // Game functions
-function startNewRandomShape(i) {
+function startNewShape(i) {
   if (typeof i === 'undefined') {
     i = Math.floor(Math.random() * shapes.length);
   }
@@ -300,8 +309,7 @@ document.addEventListener('keydown', function (e) {
   } else if (e.key === 'ArrowLeft') {
     activeShape.move(0, -1);
   } else if (e.key === ' ') {
-    activeShape.rotate();
-    activeShape.drawAt();
+    activeShape.safeRotate();
   } else if (window.ALLOW_CHEATS && e.key === ('' + parseInt(e.key, 10))) {
     // Pressing number keys allows us to debug
     const index = parseInt(e.key, 10) - 1;
@@ -310,7 +318,7 @@ document.addEventListener('keydown', function (e) {
       return;
     }
     activeShape.remove();
-    startNewRandomShape(index);
+    startNewShape(index);
   } else {
     console.log('unknown key event', e.key, e);
   }
@@ -318,4 +326,4 @@ document.addEventListener('keydown', function (e) {
 
 
 // Start the game
-startNewRandomShape();
+startNewShape();
