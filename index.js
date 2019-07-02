@@ -63,11 +63,10 @@ const shapeTriangle = [
   [1, 1, 1],
 ];
 const shapes = [
-  shapeStraight, shapeLeftL, shapeRightL, shapeSquare, shapeRightHorse, shapeLeftHorse,
-  shapeLeftHorse, shapeTriangle
+  shapeStraight, shapeLeftL, shapeRightL, shapeSquare, shapeRightHorse, shapeLeftHorse, shapeTriangle
 ];
 // must be same length as shapes
-const colors = ['red', 'blue', 'green', 'orange', 'pink', 'yellow', 'purple', 'brown'];
+const colors = ['red', 'blue', 'green', 'orange', 'pink', 'purple', 'brown'];
 
 function Shape(shape, background) {
   this.shape = shape;
@@ -267,10 +266,10 @@ function clearCompletedRows() {
       score += 100;
       break;
     case 2:
-      score += 200;
+      score += 300;
       break;
     case 3:
-      score += 400;
+      score += 500;
       break;
     case 4:
       score += 800;
